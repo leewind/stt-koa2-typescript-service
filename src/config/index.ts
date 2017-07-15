@@ -1,3 +1,4 @@
-export const mongo_str = {
-    test: 'localhost:27017'
+export const CONFIG = {
+    author: "Michael.Lee",
+    email: "leewind19841209@gmail.com"
 }

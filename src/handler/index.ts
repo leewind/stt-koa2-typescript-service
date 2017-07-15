@@ -1,4 +1,3 @@
-import {User} from '../models/User';
 import * as async from 'async';
 
 interface UserModel {
@@ -15,5 +14,5 @@ export async function createUser (ctx) {
         age: post_user.age,
         gender: post_user.gender|| "女"
     };
-    ctx.body = await new User(user).save();   
+    ctx.body = "end"
 }
