@@ -2,13 +2,15 @@
   "name": "ts-mocha-framework",
   "dependencies": {
     "async": "registry:npm/async#2.0.1+20160815105832",
-    "colors": "registry:dt/colors#1.1.0+20161228000716"
+    "colors": "registry:dt/colors#1.1.0+20161228000716",
+    "log4js": "registry:dt/log4js#0.0.0+20160726182927"
   },
   "globalDependencies": {
     "async": "registry:dt/async#1.4.2+20160602152629",
     "cookies": "registry:dt/cookies#0.5.1+20160316171810",
     "koa": "registry:dt/koa#2.0.0+20160724024233",
     "koa-bodyparser": "registry:dt/koa-bodyparser#3.0.0+20160414124440",
-    "koa-router": "registry:dt/koa-router#7.0.0+20160314083221"
+    "koa-router": "registry:dt/koa-router#7.0.0+20160314083221",
+    "socket.io-client": "registry:dt/socket.io-client#1.4.4+20161116080703"
   }
 }

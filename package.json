@@ -16,6 +16,8 @@
     "koa-router": "^7.0.1",
     "moment": "^2.14.1",
     "mongoose": "^4.5.10",
-    "supervisor": "^0.11.0"
+    "speaker": "^0.3.0",
+    "supervisor": "^0.11.0",
+    "wav": "^1.0.1"
   }
 }
