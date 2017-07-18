@@ -17,6 +17,7 @@ import {
     Promise,
     PromiseHelper,
     PromiseResult,
+    Debug,
 } from "../../common/Exports";
 import { AuthInfo, IAuthentication } from "./IAuthentication";
 import { IConnectionFactory } from "./IConnectionFactory";
@@ -111,6 +112,7 @@ export class Recognizer {
                             .OnSuccessContinueWithPromise((_: boolean) => {
                                 return this.SendSpeechContext(requestSession.RequestId, connection, speechContextJson)
                                     .OnSuccessContinueWithPromise((_: boolean) => {
+                                        Debug('SendSpeechContext Promise Success')
                                         return this.SendAudio(requestSession.RequestId, connection, audioNode, requestSession);
                                     });
                             });
@@ -183,6 +185,7 @@ export class Recognizer {
     }
 
     private ReceiveMessage = (connection: IConnection, requestSession: RequestSession): Promise<boolean> => {
+        Debug('Recognizer.ReceiveMessage')
         return connection
             .Read()
             .OnSuccessContinueWithPromise((message: ConnectionMessage) => {
@@ -290,6 +293,7 @@ export class Recognizer {
                             null,
                             audioStreamChunk.Buffer))
                         .OnSuccessContinueWithPromise((_: boolean) => {
+                            Debug('-------SendAudio Success------')
                             return this.SendAudio(requestId, connection, audioStreamNode, requestSession);
                         });
                 }
@@ -373,6 +377,7 @@ class RequestSession {
     }
 
     public OnConnectionEstablishCompleted = (statusCode: number, reason?: string): void => {
+        Debug('------Recognizer.OnConnectionEstablishCompleted-----')
         if (statusCode === 200) {
             this.OnEvent(new RecognitionStartedEvent(this.RequestId, this.audioSourceId, this.audioNodeId, this.authFetchEventId, this.connectionId));
             return;

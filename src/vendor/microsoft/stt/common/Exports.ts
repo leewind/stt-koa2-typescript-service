@@ -25,3 +25,5 @@ export * from "./RawWebsocketMessage";
 export * from "./RiffPcmEncoder";
 export * from "./Storage";
 export * from "./Stream";
+export * from "./Logger";
+export * from "./Util"

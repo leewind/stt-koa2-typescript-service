@@ -1,7 +1,8 @@
 import { EventType, IEventListener, PlatformEvent } from "../common/Exports";
 import * as log4js from "log4js";
 
-const logger = log4js.getLogger();
+let logger = log4js.getLogger();
+logger.level = 'debug';
 
 export class ConsoleLoggingListener implements IEventListener<PlatformEvent> {
     private logLevelFilter: EventType;

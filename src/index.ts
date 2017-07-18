@@ -1,6 +1,12 @@
 import * as Koa from 'koa';
 import * as bodyParser from 'koa-bodyparser';
 import {router} from './routes';
+import { RecognizerSetup, RecognizerStart, RecognizerStop } from './handler/speechtotext'
+import { RecognitionMode, SpeechResultFormat } from "./vendor/microsoft/stt/sdk/speech/Exports"
+
+let recognizer = RecognizerSetup(RecognitionMode.Interactive, 'en-US', SpeechResultFormat['Simple'], 'eabdd9d57c334da2b7a06791157d2dd5');
+RecognizerStart(recognizer);
+
 // import * as fs from "fs";
 // import * as wav from 'wav';
 // import * as Speaker from 'speaker';
@@ -24,6 +30,7 @@ import {router} from './routes';
 // });
 
 // file.pipe(reader);
+
 
 const app = new Koa();
 app.use(bodyParser());

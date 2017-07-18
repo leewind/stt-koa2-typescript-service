@@ -6,6 +6,8 @@ import {
     MessageType,
     Promise,
     RawWebsocketMessage,
+    Debug,
+    ConvertArrayBuffer,
 } from "../../common/Exports";
 
 const CRLF: string = "\r\n";
@@ -81,35 +83,59 @@ export class WebsocketMessageFormatter implements IWebsocketMessageFormatter {
                 const headersString = this.MakeHeaders(message);
                 const content = message.BinaryBody;
 
-                const fr = new FileReader();
+                // @author Michael.Lee
+                let buffer = new Buffer(headersString, "binary")
+                let result = ConvertArrayBuffer(buffer);
 
-                fr.onload = () => {
-                    const headerInt8Array = new Int8Array(fr.result);
+                const headerInt8Array = new Int8Array(result);
+                const payload = new ArrayBuffer(2 + headerInt8Array.byteLength + (content ? content.byteLength : 0));
+                const dataView = new DataView(payload);
 
-                    const payload = new ArrayBuffer(2 + headerInt8Array.byteLength + (content ? content.byteLength : 0));
-                    const dataView = new DataView(payload);
+                dataView.setInt16(0, headerInt8Array.length);
 
-                    dataView.setInt16(0, headerInt8Array.length);
+                for (let i = 0; i < headerInt8Array.byteLength; i++) {
+                    dataView.setInt8(2 + i, headerInt8Array[i]);
+                }
 
-                    for (let i = 0; i < headerInt8Array.byteLength; i++) {
-                        dataView.setInt8(2 + i, headerInt8Array[i]);
+                if (content) {
+                    const bodyInt8Array = new Int8Array(content);
+                    for (let i = 0; i < bodyInt8Array.byteLength; i++) {
+                        dataView.setInt8(2 + headerInt8Array.byteLength + i, bodyInt8Array[i]);
                     }
+                }
 
-                    if (content) {
-                        const bodyInt8Array = new Int8Array(content);
-                        for (let i = 0; i < bodyInt8Array.byteLength; i++) {
-                            dataView.setInt8(2 + headerInt8Array.byteLength + i, bodyInt8Array[i]);
-                        }
-                    }
+                deferral.Resolve(new RawWebsocketMessage(MessageType.Binary, payload, message.Id));
 
-                    deferral.Resolve(new RawWebsocketMessage(MessageType.Binary, payload, message.Id));
-                };
+                // 在nodejs中不存在FileReader对象
+                // const fr = new FileReader();
 
-                fr.onerror = () => {
-                    deferral.Reject("failed to load headers into file reader");
-                };
+                // fr.onload = () => {
+                //     const headerInt8Array = new Int8Array(fr.result);
 
-                fr.readAsArrayBuffer(new Blob([headersString]));
+                //     const payload = new ArrayBuffer(2 + headerInt8Array.byteLength + (content ? content.byteLength : 0));
+                //     const dataView = new DataView(payload);
+
+                //     dataView.setInt16(0, headerInt8Array.length);
+
+                //     for (let i = 0; i < headerInt8Array.byteLength; i++) {
+                //         dataView.setInt8(2 + i, headerInt8Array[i]);
+                //     }
+
+                //     if (content) {
+                //         const bodyInt8Array = new Int8Array(content);
+                //         for (let i = 0; i < bodyInt8Array.byteLength; i++) {
+                //             dataView.setInt8(2 + headerInt8Array.byteLength + i, bodyInt8Array[i]);
+                //         }
+                //     }
+
+                //     deferral.Resolve(new RawWebsocketMessage(MessageType.Binary, payload, message.Id));
+                // };
+
+                // fr.onerror = () => {
+                //     deferral.Reject("failed to load headers into file reader");
+                // };
+
+                // fr.readAsArrayBuffer(new Blob([headersString]));
             }
         } catch (e) {
             deferral.Reject(`Error formatting the message. ${e}`);
