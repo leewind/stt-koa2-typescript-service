@@ -17,7 +17,9 @@ import {
     Promise,
     PromiseHelper,
     PromiseResult,
-    Debug,
+    LogDebug,
+    LogInfo,
+    LogError,
 } from "../../common/Exports";
 import { AuthInfo, IAuthentication } from "./IAuthentication";
 import { IConnectionFactory } from "./IConnectionFactory";
@@ -112,11 +114,11 @@ export class Recognizer {
                             .OnSuccessContinueWithPromise((_: boolean) => {
                                 return this.SendSpeechContext(requestSession.RequestId, connection, speechContextJson)
                                     .OnSuccessContinueWithPromise((_: boolean) => {
-                                        Debug('SendSpeechContext Promise Success')
+                                        LogDebug('Recognize.Recognize.SendSpeechContext.OnSuccessContinueWithPromises Start SendAudio')
                                         return this.SendAudio(requestSession.RequestId, connection, audioNode, requestSession);
                                     });
                             });
-
+ 
                         const completionPromise = PromiseHelper.WhenAll([messageRetrievalPromise, messageSendPromise]);
 
                         completionPromise.On((r: boolean) => {
@@ -185,10 +187,11 @@ export class Recognizer {
     }
 
     private ReceiveMessage = (connection: IConnection, requestSession: RequestSession): Promise<boolean> => {
-        Debug('Recognizer.ReceiveMessage')
+        LogInfo('----------Recognizer.ReceiveMessage----------')
         return connection
             .Read()
             .OnSuccessContinueWithPromise((message: ConnectionMessage) => {
+                LogInfo(message)
                 const connectionMessage = SpeechConnectionMessage.FromConnectionMessage(message);
                 if (connectionMessage.RequestId.toLowerCase() === requestSession.RequestId.toLowerCase()) {
                     switch (connectionMessage.Path.toLowerCase()) {
@@ -293,7 +296,6 @@ export class Recognizer {
                             null,
                             audioStreamChunk.Buffer))
                         .OnSuccessContinueWithPromise((_: boolean) => {
-                            Debug('-------SendAudio Success------')
                             return this.SendAudio(requestId, connection, audioStreamNode, requestSession);
                         });
                 }
@@ -377,7 +379,6 @@ class RequestSession {
     }
 
     public OnConnectionEstablishCompleted = (statusCode: number, reason?: string): void => {
-        Debug('------Recognizer.OnConnectionEstablishCompleted-----')
         if (statusCode === 200) {
             this.OnEvent(new RecognitionStartedEvent(this.RequestId, this.audioSourceId, this.audioNodeId, this.authFetchEventId, this.connectionId));
             return;

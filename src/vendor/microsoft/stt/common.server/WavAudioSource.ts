@@ -20,7 +20,8 @@ import {
     PromiseHelper,
     Stream,
     StreamReader,
-    Debug
+    LogDebug,
+    LogInfo,
 } from "../common/Exports";
 import * as fs from "fs";
 
@@ -60,7 +61,7 @@ export class WavAudioSource implements IAudioSource {
 
         this.OnEvent(new AudioSourceInitializingEvent(this.id)); // no stream id
 
-        Debug('TurnOn')
+        LogInfo('----------WavAudioSource.TurnOn.ReadFile----------')
         fs.readFile('test.wav', (error: any, data:any) => { 
             let input = this.toArrayBuffer(data);
             if (error) {
@@ -73,34 +74,6 @@ export class WavAudioSource implements IAudioSource {
                 this.initializeDeferral.Resolve(true);
             }
         })
-
-        // const nav = window.navigator as INavigatorUserMedia;
-        // window.navigator.getUserMedia = (
-        //     window.navigator.getUserMedia ||
-        //     (window.navigator as INavigatorUserMedia).webkitGetUserMedia ||
-        //     (window.navigator as INavigatorUserMedia).mozGetUserMedia ||
-        //     (window.navigator as INavigatorUserMedia).msGetUserMedia
-        // );
-
-        // if (!window.navigator.getUserMedia) {
-        //     const errorMsg = "Browser doesnot support getUserMedia.";
-        //     this.initializeDeferral.Reject(errorMsg);
-        //     this.OnEvent(new AudioSourceErrorEvent(errorMsg, "")); // mic initialized error - no streamid at this point
-        // } else {
-        //     this.OnEvent(new AudioSourceInitializingEvent(this.id)); // no stream id
-        //     window.navigator.getUserMedia(
-        //         { audio: true },
-        //         (mediaStream: MediaStream) => {
-        //             this.mediaStream = mediaStream;
-        //             this.OnEvent(new AudioSourceReadyEvent(this.id));
-        //             this.initializeDeferral.Resolve(true);
-
-        //         }, (error: MediaStreamError) => {
-        //             const errorMsg = `Error occured processing the user media stream. ${error}`;
-        //             this.initializeDeferral.Reject(errorMsg);
-        //             this.OnEvent(new AudioSourceErrorEvent(this.id, errorMsg));
-        //         });
-        // }
 
         return this.initializeDeferral.Promise();
     }
@@ -126,7 +99,6 @@ export class WavAudioSource implements IAudioSource {
                         return audioNodeId;
                     },
                     Read: () => {
-                        Debug('Attach Stream Read')
                         return streamReader.Read();
                     },
                 };
@@ -151,8 +123,6 @@ export class WavAudioSource implements IAudioSource {
             }
         }
 
-        // this.recorder.ReleaseMediaResources();
-
         this.OnEvent(new AudioSourceOffEvent(this.id)); // no stream now
         this.initializeDeferral = null;
         return PromiseHelper.FromResult(true);
@@ -169,7 +139,6 @@ export class WavAudioSource implements IAudioSource {
                 this.streams[audioNodeId] = stream;
 
                 try {
-                    // this.recorder.Record(this.mediaStream, stream);
                     stream.Write(this.mediaStream);
                 } catch (error) {
                     const errorMsg = `Error occured processing the user media stream. ${error}`;

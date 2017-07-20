@@ -11,7 +11,6 @@ import {
     PlatformEvent,
     Promise,
     ConnectionEvent,
-    Debug,
 } from "../common/Exports";
 import { WebsocketMessageAdapter } from "./WebsocketMessageAdapter";
 
@@ -95,7 +94,6 @@ export class WebsocketConnection implements IConnection {
     }
 
     public Open = (): Promise<ConnectionOpenResponse> => {
-        Debug('WebsocketConnection.Open')
         return this.connectionMessageAdapter.Open();
     }
 

@@ -1,10 +1,20 @@
 import { CreateRecognizer } from "../vendor/microsoft/stt/sdk/speech.server/Exports"
-import { SpeechRecognitionResultEvent, Recognizer, CognitiveSubscriptionKeyAuthentication, Device, OS, RecognizerConfig, Context, SpeechConfig, RecognitionMode, SpeechResultFormat } from "../vendor/microsoft/stt/sdk/speech/Exports"
-import * as log4js from "log4js";
-import * as nodeOS from 'os';
+import { 
+  SpeechRecognitionResultEvent, 
+  Recognizer, 
+  CognitiveSubscriptionKeyAuthentication, 
+  Device, 
+  OS, 
+  RecognizerConfig, 
+  Context, 
+  SpeechConfig, 
+  RecognitionMode, 
+  SpeechResultFormat 
+} from "../vendor/microsoft/stt/sdk/speech/Exports"
 
-let logger = log4js.getLogger();
-logger.level = 'debug';
+import {
+  LogDebug,
+} from "../vendor/microsoft/stt/common/Exports"
 
 const SimulatedUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
 
@@ -32,36 +42,36 @@ const RecognizerStart = (recognizer: Recognizer): void => {
     */
     switch (event.Name) {
       case "RecognitionTriggeredEvent":
-        logger.debug("Initializing");
+        LogDebug("Initializing");
         break;
       case "ListeningStartedEvent":
-        logger.debug("Listening");
+        LogDebug("Listening");
         break;
       case "RecognitionStartedEvent":
-        logger.debug("Listening_Recognizing");
+        LogDebug("Listening_Recognizing");
         break;
       case "SpeechStartDetectedEvent":
-        logger.debug("Listening_DetectedSpeech_Recognizing");
+        LogDebug("Listening_DetectedSpeech_Recognizing");
         console.log(JSON.stringify(event.Result)); // check console for other information in result
         break;
       case "SpeechHypothesisEvent":
-        logger.debug(event.Result.Text);
+        LogDebug(event.Result.Text);
         console.log(JSON.stringify(event.Result)); // check console for other information in result
         break;
       case "SpeechEndDetectedEvent":
         // OnSpeechEndDetected();
-        logger.debug("Processing_Adding_Final_Touches");
+        LogDebug("Processing_Adding_Final_Touches");
         console.log(JSON.stringify(event.Result)); // check console for other information in result
         break;
       case "SpeechSimplePhraseEvent":
-        logger.debug(JSON.stringify(event.Result, null, 3));
+        LogDebug(JSON.stringify(event.Result, null, 3));
         break;
       case "SpeechDetailedPhraseEvent":
-        logger.debug(JSON.stringify(event.Result, null, 3));
+        LogDebug(JSON.stringify(event.Result, null, 3));
         break;
       case "RecognitionEndedEvent":
         // OnComplete();
-        logger.debug("Idle");
+        LogDebug("Idle");
         console.log(JSON.stringify(event)); // Debug information
         break;
     }
