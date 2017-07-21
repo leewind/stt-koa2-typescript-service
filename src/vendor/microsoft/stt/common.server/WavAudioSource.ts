@@ -22,8 +22,10 @@ import {
     StreamReader,
     LogInfo,
 } from "../common/Exports";
-import _ from 'lodash';
-import mediastream from "mediastream";
+
+import { IRecorder } from "./IRecorder";
+
+import * as _ from 'lodash';
 
 export class WavAudioSource implements IAudioSource {
 
@@ -35,20 +37,23 @@ export class WavAudioSource implements IAudioSource {
 
     private initializeDeferral: Deferred<boolean>;
 
-    private mediaStream: ArrayBuffer;
+    private recorder: IRecorder;
 
-    private toArrayBuffer(buffer:Buffer) {
-        var arrayBuffer = new ArrayBuffer(buffer.length);
-        var view = new Uint8Array(arrayBuffer);
-        for (var i = 0; i < buffer.length; ++i) {
-            view[i] = buffer[i];
-        }
-        return arrayBuffer;
-    }
+    // private mediaStream: mediastream;
 
-    public constructor(audioSourceId?: string) {
+    // private toArrayBuffer(buffer:Buffer) {
+    //     var arrayBuffer = new ArrayBuffer(buffer.length);
+    //     var view = new Uint8Array(arrayBuffer);
+    //     for (var i = 0; i < buffer.length; ++i) {
+    //         view[i] = buffer[i];
+    //     }
+    //     return arrayBuffer;
+    // }
+
+    public constructor(recorder: IRecorder, audioSourceId?: string) {
         this.id = audioSourceId ? audioSourceId : CreateNoDashGuid();
         this.events = new EventSource();
+        this.recorder = recorder;
     }
 
     public TurnOn = (): Promise<boolean> => {
@@ -76,7 +81,7 @@ export class WavAudioSource implements IAudioSource {
 
         _.defer(() => {
             LogInfo('----------WavAudioSource.TurnOn.Resolve----------');
-            this.mediaStream = mediastream({audio: true});
+            // this.mediaStream = mediastream({audio: true});
             this.OnEvent(new AudioSourceReadyEvent(this.id));
             this.initializeDeferral.Resolve(true);
         });
@@ -129,6 +134,8 @@ export class WavAudioSource implements IAudioSource {
             }
         }
 
+        this.recorder.ReleaseMediaResources();
+
         this.OnEvent(new AudioSourceOffEvent(this.id)); // no stream now
         this.initializeDeferral = null;
         return PromiseHelper.FromResult(true);
@@ -145,7 +152,7 @@ export class WavAudioSource implements IAudioSource {
                 this.streams[audioNodeId] = stream;
 
                 try {
-                    stream.Write(this.mediaStream);
+                    this.recorder.Record(stream);
                 } catch (error) {
                     const errorMsg = `Error occured processing the user media stream. ${error}`;
                     this.initializeDeferral.Reject(errorMsg);

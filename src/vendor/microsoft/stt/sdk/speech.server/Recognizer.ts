@@ -1,4 +1,4 @@
-import { WavAudioSource } from "../../common.server/Exports";
+import { WavAudioSource, PcmRecorder } from "../../common.server/Exports";
 import { IAudioSource, Promise, Storage } from "../../common/Exports";
 import { IAuthentication, Recognizer, RecognizerConfig } from "../speech/Exports";
 import { SpeechConnectionFactory } from "./SpeechConnectionFactory";
@@ -13,7 +13,7 @@ const CreateRecognizerWithPcmRecorder = (recognizerConfig: RecognizerConfig, aut
     return CreateRecognizerWithCustomAudioSource(
         recognizerConfig,
         authentication,
-        new WavAudioSource());
+        new WavAudioSource(new PcmRecorder()));
 };
 
 const CreateRecognizerWithCustomAudioSource = (recognizerConfig: RecognizerConfig, authentication: IAuthentication, audioSource: IAudioSource): Recognizer =>  {
