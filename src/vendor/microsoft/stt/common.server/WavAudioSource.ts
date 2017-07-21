@@ -20,11 +20,10 @@ import {
     PromiseHelper,
     Stream,
     StreamReader,
-    LogDebug,
     LogInfo,
 } from "../common/Exports";
-import * as fs from "fs";
-
+import _ from 'lodash';
+import mediastream from "mediastream";
 
 export class WavAudioSource implements IAudioSource {
 
@@ -61,19 +60,26 @@ export class WavAudioSource implements IAudioSource {
 
         this.OnEvent(new AudioSourceInitializingEvent(this.id)); // no stream id
 
-        LogInfo('----------WavAudioSource.TurnOn.ReadFile----------')
-        fs.readFile('test.wav', (error: any, data:any) => { 
-            let input = this.toArrayBuffer(data);
-            if (error) {
-                const errorMsg = `Error occured processing the user media stream. ${error}`;
-                this.initializeDeferral.Reject(errorMsg);
-                this.OnEvent(new AudioSourceErrorEvent(this.id, errorMsg));
-            }else{
-                this.mediaStream = input;
-                this.OnEvent(new AudioSourceReadyEvent(this.id));
-                this.initializeDeferral.Resolve(true);
-            }
-        })
+        // LogInfo('----------WavAudioSource.TurnOn.ReadFile----------')
+        // fs.readFile('test.wav', (error: any, data:any) => { 
+        //     let input = this.toArrayBuffer(data);
+        //     if (error) {
+        //         const errorMsg = `Error occured processing the user media stream. ${error}`;
+        //         this.initializeDeferral.Reject(errorMsg);
+        //         this.OnEvent(new AudioSourceErrorEvent(this.id, errorMsg));
+        //     }else{
+        //         this.mediaStream = input;
+        //         this.OnEvent(new AudioSourceReadyEvent(this.id));
+        //         this.initializeDeferral.Resolve(true);
+        //     }
+        // })
+
+        _.defer(() => {
+            LogInfo('----------WavAudioSource.TurnOn.Resolve----------');
+            this.mediaStream = mediastream({audio: true});
+            this.OnEvent(new AudioSourceReadyEvent(this.id));
+            this.initializeDeferral.Resolve(true);
+        });
 
         return this.initializeDeferral.Promise();
     }
