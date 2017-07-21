@@ -9,7 +9,7 @@ const ConvertArrayBuffer = (buffer: Buffer) => {
     return arrayBuffer;
 }
 
-const readFile = (filepath: string) => {
+const ReadFile = (filepath: string) => {
     return new Promise((resolve, reject) => {
         fs.readFile(filepath, (err, buffer) => {
             if (err) {
@@ -20,4 +20,4 @@ const readFile = (filepath: string) => {
     });
 };
 
-export { ConvertArrayBuffer, readFile }
+export { ConvertArrayBuffer, ReadFile }
