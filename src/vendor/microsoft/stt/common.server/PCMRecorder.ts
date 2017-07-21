@@ -6,9 +6,12 @@ export class PcmRecorder implements IRecorder {
     private mediaResources: IMediaResources;
     public Record = (outputStream: Stream<ArrayBuffer>): void => {
 
-        ReadFile("test.wav").then((buffer) => {
+        ReadFile("test.wav").then((buffer: Buffer) => {
             return WavDecoder.decode(buffer);
-        }).then(function(audioData) {
+        }).then((audioData) => {
+            // 1261612 buffer
+            // 630784 audio size
+            // 457857 
             const desiredSampleRate = 16000;
             let bufferSize = 2048;
             let isFirstFrameWritten: boolean = false;
