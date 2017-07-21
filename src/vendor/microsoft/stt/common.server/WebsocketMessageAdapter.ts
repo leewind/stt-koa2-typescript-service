@@ -22,7 +22,6 @@ import {
     RawWebsocketMessage,
     LogDebug,
     LogInfo,
-    LogError,
 } from "../common/Exports";
 
 import * as WebSocket from 'ws';
@@ -84,7 +83,6 @@ export class WebsocketMessageAdapter {
         this.connectionEstablishDeferral = new Deferred<ConnectionOpenResponse>();
         this.connectionState = ConnectionState.Connecting;
 
-        LogDebug(this.uri)
         this.websocketClient = new WebSocket(this.uri);
 
         this.receivingMessageQueue = new Queue<ConnectionMessage>();
@@ -95,14 +93,14 @@ export class WebsocketMessageAdapter {
         this.OnEvent(new ConnectionStartEvent(this.connectionId, this.uri));
 
         this.websocketClient.on('open', (e: Event) => {
-            LogInfo('WebsocketMessageAdapter.websocketClient.open.Callback');
+            LogInfo('>>> WebsocketMessageAdapter.websocketClient.open.Callback');
             this.connectionState = ConnectionState.Connected;
             this.OnEvent(new ConnectionEstablishedEvent(this.connectionId));
             this.connectionEstablishDeferral.Resolve(new ConnectionOpenResponse(200, ""));
         })
 
         this.websocketClient.on('error', (e: Event) => {
-            LogDebug('WebsocketMessageAdapter.websocketClient.error.Callback')
+            LogDebug('>>> WebsocketMessageAdapter.websocketClient.error.Callback')
             // TODO: Understand what this is error is. Will we still get onClose ?
             if (this.connectionState !== ConnectionState.Connecting) {
                 // TODO: Is this required ?
@@ -111,7 +109,7 @@ export class WebsocketMessageAdapter {
         });
 
         this.websocketClient.on('close', (e: CloseEvent) => {
-            LogInfo('WebsocketMessageAdapter.websocketClient.close.Callback')
+            LogInfo('>>> WebsocketMessageAdapter.websocketClient.close.Callback')
             if (this.connectionState === ConnectionState.Connecting) {
                 this.connectionState = ConnectionState.Disconnected;
                 this.OnEvent(new ConnectionEstablishErrorEvent(this.connectionId, e.code, e.reason));
@@ -124,15 +122,14 @@ export class WebsocketMessageAdapter {
         });
 
         this.websocketClient.on('message', (e: MessageEvent) => {
-            LogInfo('WebsocketMessageAdapter.websocketClient.message.Callback')
+            LogInfo('>>> WebsocketMessageAdapter.websocketClient.message.Callback')
             const networkReceivedTime = new Date().toISOString();
             if (this.connectionState === ConnectionState.Connected) {
                 const deferred = new Deferred<ConnectionMessage>();
                 // let id = ++this.idCounter;
                 this.receivingMessageQueue.EnqueueFromPromise(deferred.Promise());
 
-                LogDebug(e)
-                if (e.data instanceof Buffer) {
+                if (e instanceof ArrayBuffer) {
                     // const fileReader = new FileReader();
                     // fileReader.onload = (le: Event) => {
                     //     const rawMessage = new RawWebsocketMessage(MessageType.Binary, fileReader.result);
@@ -153,7 +150,8 @@ export class WebsocketMessageAdapter {
 
                     // fileReader.readAsArrayBuffer(e.data);
                 } else {
-                    const rawMessage = new RawWebsocketMessage(MessageType.Text, e.data);
+                    LogDebug(["----------Receive RawWebsocketMessage----------", e])
+                    const rawMessage = new RawWebsocketMessage(MessageType.Text, e);
                     this.messageFormatter
                         .ToConnectionMessage(rawMessage)
                         .On((connectionMessage: ConnectionMessage) => {
@@ -200,14 +198,12 @@ export class WebsocketMessageAdapter {
             return PromiseHelper.FromError<ConnectionMessage>(`Cannot read on connection that is in ${this.connectionState} state`);
         }
 
-        LogInfo('WebsocketMessageAdapter.Read receivingMessageQueue Dequeue')
         return this.receivingMessageQueue.Dequeue();
     }
 
     public Close = (reason?: string): Promise<boolean> => {
         if (this.websocketClient) {
             if (this.connectionState !== ConnectionState.Connected) {
-                // this.websocketClient.close(1000, reason ? reason : "Normal closure by client");
                 this.websocketClient.close();
             }
         } else {
@@ -225,13 +221,10 @@ export class WebsocketMessageAdapter {
 
     private SendRawMessage = (sendItem: ISendItem): Promise<boolean> => {
         try {
-            this.OnEvent(new ConnectionMessageSentEvent(this.connectionId, new Date().toISOString(), sendItem.Message));
-            
-            LogInfo('----------WebsocketMessageAdapter.send----------')
-            LogInfo(sendItem.RawWebsocketMessage.Payload)
+            LogInfo(['----------WebsocketMessageAdapter.send----------', sendItem.RawWebsocketMessage.Payload])
 
+            this.OnEvent(new ConnectionMessageSentEvent(this.connectionId, new Date().toISOString(), sendItem.Message));
             this.websocketClient.send(sendItem.RawWebsocketMessage.Payload);
-            
             return PromiseHelper.FromResult(true);
         } catch (e) {
             return PromiseHelper.FromError<boolean>(`websocket send error: ${e}`);

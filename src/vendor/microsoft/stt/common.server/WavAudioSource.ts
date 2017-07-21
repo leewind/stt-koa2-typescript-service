@@ -20,7 +20,6 @@ import {
     PromiseHelper,
     Stream,
     StreamReader,
-    LogInfo,
 } from "../common/Exports";
 
 import { IRecorder } from "./IRecorder";
@@ -39,17 +38,6 @@ export class WavAudioSource implements IAudioSource {
 
     private recorder: IRecorder;
 
-    // private mediaStream: mediastream;
-
-    // private toArrayBuffer(buffer:Buffer) {
-    //     var arrayBuffer = new ArrayBuffer(buffer.length);
-    //     var view = new Uint8Array(arrayBuffer);
-    //     for (var i = 0; i < buffer.length; ++i) {
-    //         view[i] = buffer[i];
-    //     }
-    //     return arrayBuffer;
-    // }
-
     public constructor(recorder: IRecorder, audioSourceId?: string) {
         this.id = audioSourceId ? audioSourceId : CreateNoDashGuid();
         this.events = new EventSource();
@@ -65,23 +53,7 @@ export class WavAudioSource implements IAudioSource {
 
         this.OnEvent(new AudioSourceInitializingEvent(this.id)); // no stream id
 
-        // LogInfo('----------WavAudioSource.TurnOn.ReadFile----------')
-        // fs.readFile('test.wav', (error: any, data:any) => { 
-        //     let input = this.toArrayBuffer(data);
-        //     if (error) {
-        //         const errorMsg = `Error occured processing the user media stream. ${error}`;
-        //         this.initializeDeferral.Reject(errorMsg);
-        //         this.OnEvent(new AudioSourceErrorEvent(this.id, errorMsg));
-        //     }else{
-        //         this.mediaStream = input;
-        //         this.OnEvent(new AudioSourceReadyEvent(this.id));
-        //         this.initializeDeferral.Resolve(true);
-        //     }
-        // })
-
         _.defer(() => {
-            LogInfo('----------WavAudioSource.TurnOn.Resolve----------');
-            // this.mediaStream = mediastream({audio: true});
             this.OnEvent(new AudioSourceReadyEvent(this.id));
             this.initializeDeferral.Resolve(true);
         });
