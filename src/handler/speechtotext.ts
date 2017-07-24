@@ -35,6 +35,7 @@ const RecognizerSetup = (recognitionMode: RecognitionMode, language: string, for
 }
 
 const RecognizerStart = (recognizer: Recognizer): void => {
+  let messages = new Array<any>();
   recognizer.Recognize((event: any) => {
     /*
      Alternative syntax for typescript devs.
@@ -42,37 +43,50 @@ const RecognizerStart = (recognizer: Recognizer): void => {
     */
     switch (event.Name) {
       case "RecognitionTriggeredEvent":
-        LogDebug("Initializing");
+        LogDebug("#####Initializing");
         break;
       case "ListeningStartedEvent":
-        LogDebug("Listening");
+        LogDebug("#####Listening");
         break;
       case "RecognitionStartedEvent":
-        LogDebug("Listening_Recognizing");
+        LogDebug("#####Listening_Recognizing");
         break;
       case "SpeechStartDetectedEvent":
-        LogDebug("Listening_DetectedSpeech_Recognizing");
+        LogDebug("#####Listening_DetectedSpeech_Recognizing");
         LogDebug(JSON.stringify(event.Result)); // check console for other information in result
         break;
       case "SpeechHypothesisEvent":
+        LogDebug("#####SpeechHypothesisEvent")
         LogDebug(event.Result.Text);
         LogDebug(JSON.stringify(event.Result)); // check console for other information in result
         break;
       case "SpeechEndDetectedEvent":
         // OnSpeechEndDetected();
-        LogDebug("Processing_Adding_Final_Touches");
+        LogDebug("#####Processing_Adding_Final_Touches");
         LogDebug(JSON.stringify(event.Result)); // check console for other information in result
         break;
       case "SpeechSimplePhraseEvent":
+        messages.push(event.Result);
+        LogDebug("#####SpeechSimplePhraseEvent")
         LogDebug(JSON.stringify(event.Result, null, 3));
+
         break;
       case "SpeechDetailedPhraseEvent":
+        LogDebug("#####SpeechDetailedPhraseEvent")
         LogDebug(JSON.stringify(event.Result, null, 3));
         break;
       case "RecognitionEndedEvent":
         // OnComplete();
-        LogDebug("Idle");
+        LogDebug("#####Idle");
         LogDebug(JSON.stringify(event)); // Debug information
+
+        let result = '';
+        messages.forEach((msg) => {
+          if(msg.DisplayText){
+            result = result + ' ' + msg.DisplayText
+          }
+        })
+        LogDebug(result.trim());
         break;
     }
   })

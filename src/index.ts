@@ -17,7 +17,7 @@ const ReadFile = (filepath: string) => {
 };
 
 ReadFile('test.wav').then((buffer: Buffer) => {
-    let recognizer = RecognizerSetup(RecognitionMode.Interactive, 'en-US', SpeechResultFormat['Simple'], 'eabdd9d57c334da2b7a06791157d2dd5', buffer);
+    let recognizer = RecognizerSetup(RecognitionMode.Dictation, 'en-US', SpeechResultFormat['Simple'], 'eabdd9d57c334da2b7a06791157d2dd5', buffer);
     RecognizerStart(recognizer);
 })
 
