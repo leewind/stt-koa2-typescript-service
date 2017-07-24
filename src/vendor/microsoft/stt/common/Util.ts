@@ -9,15 +9,16 @@ const ConvertArrayBuffer = (buffer: Buffer) => {
     return arrayBuffer;
 }
 
-const ReadFile = (filepath: string) => {
-    return new Promise((resolve, reject) => {
-        fs.readFile(filepath, (err, buffer) => {
-            if (err) {
-                return reject(err);
-            }
-            return resolve(buffer);
-        });
-    });
-};
+// const ReadFile = (filepath: string) => {
+//     return new Promise((resolve, reject) => {
+//         fs.readFile(filepath, (err, buffer) => {
+//             if (err) {
+//                 return reject(err);
+//             }
+//             return resolve(buffer);
+//         });
+//     });
+// };
 
-export { ConvertArrayBuffer, ReadFile }
+// export { ConvertArrayBuffer, ReadFile }
+export { ConvertArrayBuffer };

@@ -1,7 +1,7 @@
-import * as log4js from "log4js";
+import { getLogger } from 'log4js';
 
-let logger = log4js.getLogger();
-logger.level = 'debug'
+const logger = getLogger();
+logger.level = 'debug';
 
 const LogDebug = (message: any): void => {
   logger.debug(message);

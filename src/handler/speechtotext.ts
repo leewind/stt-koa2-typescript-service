@@ -1,4 +1,4 @@
-import { CreateRecognizer } from "../vendor/microsoft/stt/sdk/speech.server/Exports"
+import { CreateRecognizerWithPcmRecorderByInputBuffer } from "../vendor/microsoft/stt/sdk/speech.server/Exports"
 import { 
   SpeechRecognitionResultEvent, 
   Recognizer, 
@@ -18,7 +18,7 @@ import {
 
 const SimulatedUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
 
-const RecognizerSetup = (recognitionMode: RecognitionMode, language: string, format: SpeechResultFormat, subscriptionKey: string): Recognizer => {
+const RecognizerSetup = (recognitionMode: RecognitionMode, language: string, format: SpeechResultFormat, subscriptionKey: string, buffer: Buffer): Recognizer => {
   var recognizerConfig = new RecognizerConfig(
     new SpeechConfig(
       new Context(
@@ -31,7 +31,7 @@ const RecognizerSetup = (recognitionMode: RecognitionMode, language: string, for
   // Alternatively use SDK.CognitiveTokenAuthentication(fetchCallback, fetchOnExpiryCallback) for token auth
   var authentication = new CognitiveSubscriptionKeyAuthentication(subscriptionKey);
 
-  return CreateRecognizer(recognizerConfig, authentication);
+  return CreateRecognizerWithPcmRecorderByInputBuffer(recognizerConfig, authentication, buffer);
 }
 
 const RecognizerStart = (recognizer: Recognizer): void => {
@@ -52,16 +52,16 @@ const RecognizerStart = (recognizer: Recognizer): void => {
         break;
       case "SpeechStartDetectedEvent":
         LogDebug("Listening_DetectedSpeech_Recognizing");
-        console.log(JSON.stringify(event.Result)); // check console for other information in result
+        LogDebug(JSON.stringify(event.Result)); // check console for other information in result
         break;
       case "SpeechHypothesisEvent":
         LogDebug(event.Result.Text);
-        console.log(JSON.stringify(event.Result)); // check console for other information in result
+        LogDebug(JSON.stringify(event.Result)); // check console for other information in result
         break;
       case "SpeechEndDetectedEvent":
         // OnSpeechEndDetected();
         LogDebug("Processing_Adding_Final_Touches");
-        console.log(JSON.stringify(event.Result)); // check console for other information in result
+        LogDebug(JSON.stringify(event.Result)); // check console for other information in result
         break;
       case "SpeechSimplePhraseEvent":
         LogDebug(JSON.stringify(event.Result, null, 3));
@@ -72,7 +72,7 @@ const RecognizerStart = (recognizer: Recognizer): void => {
       case "RecognitionEndedEvent":
         // OnComplete();
         LogDebug("Idle");
-        console.log(JSON.stringify(event)); // Debug information
+        LogDebug(JSON.stringify(event)); // Debug information
         break;
     }
   })

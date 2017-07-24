@@ -1,11 +1,25 @@
 import * as Koa from 'koa';
 import * as bodyParser from 'koa-bodyparser';
+import { readFile } from 'fs';
 import {router} from './routes';
 import { RecognizerSetup, RecognizerStart, RecognizerStop } from './handler/speechtotext'
-import { RecognitionMode, SpeechResultFormat } from "./vendor/microsoft/stt/sdk/speech/Exports"
+import { RecognitionMode, SpeechResultFormat } from "./vendor/microsoft/stt/sdk/speech/Exports";
 
-let recognizer = RecognizerSetup(RecognitionMode.Interactive, 'en-US', SpeechResultFormat['Simple'], 'eabdd9d57c334da2b7a06791157d2dd5');
-RecognizerStart(recognizer);
+const ReadFile = (filepath: string) => {
+    return new Promise((resolve, reject) => {
+        readFile(filepath, (err, buffer) => {
+            if (err) {
+                return reject(err);
+            }
+            return resolve(buffer);
+        });
+    });
+};
+
+ReadFile('test.wav').then((buffer: Buffer) => {
+    let recognizer = RecognizerSetup(RecognitionMode.Interactive, 'en-US', SpeechResultFormat['Simple'], 'eabdd9d57c334da2b7a06791157d2dd5', buffer);
+    RecognizerStart(recognizer);
+})
 
 const app = new Koa();
 app.use(bodyParser());

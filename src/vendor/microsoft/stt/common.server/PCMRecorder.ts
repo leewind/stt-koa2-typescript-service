@@ -1,17 +1,22 @@
-import { RiffPcmEncoder, Stream, ConvertArrayBuffer, LogDebug, ReadFile } from "../common/Exports";
+import { RiffPcmEncoder, Stream, ConvertArrayBuffer, LogDebug } from "../common/Exports";
 import { IRecorder } from "./IRecorder";
 import * as WavDecoder from "wav-decoder";
 
 export class PcmRecorder implements IRecorder {
     private mediaResources: IMediaResources;
+    private buffer: Buffer;
+
+    constructor(buffer: Buffer) {
+        this.buffer = buffer;
+    }
+
     public Record = (outputStream: Stream<ArrayBuffer>): void => {
 
-        ReadFile("test.wav").then((buffer: Buffer) => {
-            return WavDecoder.decode(buffer);
-        }).then((audioData) => {
-            // 1261612 buffer
-            // 630784 audio size
-            // 457857 
+        // ReadFile("test.wav").then((buffer: Buffer) => {
+        //     return WavDecoder.decode(buffer);
+        // }).
+        
+        WavDecoder.decode(this.buffer).then((audioData) => {
             const desiredSampleRate = 16000;
             let bufferSize = 2048;
             let isFirstFrameWritten: boolean = false;
