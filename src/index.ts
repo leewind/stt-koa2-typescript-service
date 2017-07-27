@@ -1,10 +1,11 @@
 import * as Koa from 'koa';
-import * as bodyParser from 'koa-bodyparser';
+import * as koaBody from 'koa-body';
+
 import {router} from './routes';
 
 const app = new Koa();
+app.use(koaBody({ multipart: true }));
 app.use(router.routes());
-app.use(bodyParser());
 app.listen(30001, ()=> {
     console.log('>>| Listen on 30001');
 });
