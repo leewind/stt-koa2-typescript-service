@@ -13,6 +13,8 @@ import {
 } from "../vendor/microsoft/stt/sdk/speech/Exports"
 
 import {
+  Deferred,
+  Promise,
   LogDebug,
 } from "../vendor/microsoft/stt/common/Exports"
 
@@ -34,7 +36,9 @@ const RecognizerSetup = (recognitionMode: RecognitionMode, language: string, for
   return CreateRecognizerWithPcmRecorderByInputBuffer(recognizerConfig, authentication, buffer);
 }
 
-const RecognizerStart = (recognizer: Recognizer): void => {
+const RecognizerStart = (recognizer: Recognizer): Promise<string> => {
+  const deferral = new Deferred<string>();
+
   let messages = new Array<any>();
   recognizer.Recognize((event: any) => {
     /*
@@ -87,6 +91,7 @@ const RecognizerStart = (recognizer: Recognizer): void => {
           }
         })
         LogDebug(result.trim());
+        deferral.Resolve(result.trim())
         break;
     }
   })
@@ -96,6 +101,8 @@ const RecognizerStart = (recognizer: Recognizer): void => {
     (error) => {
       console.error(error);
     });
+
+  return deferral.Promise();
 }
 
 const RecognizerStop = (recognizer: Recognizer): void => {
