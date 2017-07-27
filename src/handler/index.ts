@@ -1,18 +1,31 @@
-import * as async from 'async';
+import {
+  RecognitionMode,
+  SpeechResultFormat
+} from "../vendor/microsoft/stt/sdk/speech/Exports"
+import  { 
+  RecognizerSetup, 
+  RecognizerStart, 
+  RecognizerStop, 
+  ReadFile 
+} from '../business/recognize'
 
-interface UserModel {
-    name: string;
-    age: number;
-    gender: string;
+const RecognizeHandler = (ctx): void => {
+    ReadFile('test.wav').then((buffer: Buffer) => {
+        let recognizer = RecognizerSetup(RecognitionMode.Dictation, 'en-US', SpeechResultFormat['Simple'], 'eabdd9d57c334da2b7a06791157d2dd5', buffer);
+        RecognizerStart(recognizer).then( (result: string) => {
+            ctx.body = '{result: 1}';
+        });
+    })
 }
 
-export async function createUser (ctx) {
-    let post_user = ctx.request.body;
-    let user:UserModel;
-    user = {
-        name: post_user.name,
-        age: post_user.age,
-        gender: post_user.gender|| "女"
-    };
-    ctx.body = "end"
+export function recognize (ctx, next) {
+    return next().then(() => {
+        return ReadFile('test.wav').then((buffer: Buffer) => {
+            let recognizer = RecognizerSetup(RecognitionMode.Dictation, 'en-US', SpeechResultFormat['Simple'], 'eabdd9d57c334da2b7a06791157d2dd5', buffer);
+            return RecognizerStart(recognizer).then( (result: string) => {
+                ctx.body = {result};
+                RecognizerStop(recognizer);
+            });
+        })
+    })
 }
