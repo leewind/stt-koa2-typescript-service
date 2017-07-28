@@ -36,8 +36,14 @@
 
 5. 编译完成启动项目
 
-    ```
+    ```shell
     npm start
+    ```
+
+    或者采用nohup方式
+
+    ```shell
+    nohup node ./lib/index.js &
     ```
 
 ## TODO
