@@ -48,3 +48,12 @@
     ```
     {"result":"My dream job is to become a CEO in a company. Bring some money to me. Scales and I think I will come see you finally."}
     ```
+
+## API
+
++ 接口: /recognize
++ METHOD: POST
++ REQUEST: 文件上传格式multipart/form-data
+    - 参数 file: File
++ RESPONSE: json对象
+    - 案例: {"result":"My dream job is to become a CEO in a company. Bring some money to me. Scales and I think I will come see you finally."}
