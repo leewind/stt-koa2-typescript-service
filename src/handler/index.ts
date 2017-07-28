@@ -27,6 +27,14 @@ export function recognize(ctx, next) {
             return RecognizerStart(recognizer).then((result: string) => {
                 ctx.body = { result };
                 RecognizerStop(recognizer);
+            }, (error: any) => {
+                if(ctx){
+                    try {
+                        ctx.body = { result: "No Result From BingASR" };
+                    } catch (error) {
+                        
+                    }
+                }
             });
         })
     })
