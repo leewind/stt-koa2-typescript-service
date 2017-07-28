@@ -51,6 +51,7 @@
 
 ## API
 
+### /recognize
 + 接口: /recognize
 + METHOD: POST
 + REQUEST: 文件上传格式multipart/form-data
