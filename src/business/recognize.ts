@@ -42,10 +42,11 @@ const RecognizerStart = (recognizer: Recognizer): Promise<string> => {
   return new Promise((resolve, reject) => {
     let messages = new Array<any>();
 
-    Events.Instance.Attach((event: any) => {
+    let EventTrigger = Events.Instance.Attach((event: any) => {
       switch (event.Name) {
         case "ConnectionClosedEvent":
           LogDebug("ConnectionClosedEvent");
+          EventTrigger.Detach();
           reject('Connection Closed');
           break;
         case "RecognitionTriggeredEvent":
@@ -93,6 +94,7 @@ const RecognizerStart = (recognizer: Recognizer): Promise<string> => {
             }
           })
           LogDebug(result.trim());
+          EventTrigger.Detach();
           resolve(result.trim())
           break;
       }
@@ -105,10 +107,8 @@ const RecognizerStart = (recognizer: Recognizer): Promise<string> => {
     })
       .On(() => {
         // The request succeeded. Nothing to do here.
-        LogDebug('END')
       },
       (error) => {
-        // console.error(error);
         LogDebug(error)
       });
   });
