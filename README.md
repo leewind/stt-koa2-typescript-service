@@ -1,50 +1,50 @@
-# typescript-koa-framework
-用 koa v2.0 框架和 TypeScript 写的服务器端架构。
+# STT-KOA2-TYPESCRIPT-SERVICE
 
-结构如下：
+## HOWTO
 
-```
-.
-├── README.md
-├── package.json
-├── src
-│   ├── config
-│   │   └── index.ts
-│   ├── handler
-│   │   └── index.ts
-│   ├── index.ts
-│   ├── models
-│   │   ├── User.ts
-│   │   ├── db.ts
-│   │   └── index.ts
-│   └── routes
-│       └── index.ts
-├── tsconfig.json
-└── typings.json
-```
+1. 安装`nodejs`开发环境，参考[nodejs](https://nodejs.org/zh-cn/)，推荐使用7.1.0以上版本参考[这里](https://nodejs.org/dist/v7.1.0/)
+2. 安装`typescript`的编译环境
 
-```
-$ npm i
+    ```javascript
+    npm install -g typescript
+    ```
 
-```
+    安装完成之后查看版本
 
-```
-$ typings i
+    ```shell
+    ➜  stt-koa2-typescript-service git:(master) ✗ tsc -v
+    Version 2.2.2
+    ```
 
-```
+    安装typings作为TypeScript Definition Manager
 
-```
-$ tsc -w
+    ```shell
+    npm install typings --global
+    ```
+3. `git clone`项目，进入目录，安装依赖
 
-```
-修改数据库连接
+     ```shell
+     npm install
+     typings install
+     ```
 
-```
-$ npm start
+4. 安装完成之后，进行typescript的编译
 
-```
+    ```shell
+    tsc
+    ```
 
-启动在 30001 端口
+5. 编译完成启动项目
 
+    ```
+    npm start
+    ```
 
-GET `localhost:30001/test`
+## TODO
+
+1. 进去example的访问页面，访问`localhost:30001/example`
+2. 选择一个wav文件，点击upload进行上传
+3. 如果顺利20-30秒之后会返回结果，例如
+    ```
+    {"result":"My dream job is to become a CEO in a company. Bring some money to me. Scales and I think I will come see you finally."}
+    ```
