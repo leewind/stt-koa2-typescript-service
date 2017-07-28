@@ -17,7 +17,7 @@ export function recognize(ctx, next) {
     // https://github.com/koajs/examples/blob/master/upload/app.js
     const file = ctx.request.body.files.file;
     const reader = fs.createReadStream(file.path);
-    const filepath = path.join(os.tmpdir(), Date.now() + Math.random().toString() + 'wav');
+    const filepath = path.join(os.tmpdir(), Date.now() + Math.random().toString() + '.wav');
     const stream = fs.createWriteStream(filepath);
     reader.pipe(stream);
 
