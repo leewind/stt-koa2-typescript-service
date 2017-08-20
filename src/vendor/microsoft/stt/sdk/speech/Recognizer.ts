@@ -48,6 +48,7 @@ import {
     ISpeechHypothesisResult,
     ISpeechStartDetectedResult,
 } from "./SpeechResults";
+import { defer } from "underscore";
 
 export class Recognizer {
     private authentication: IAuthentication;
@@ -206,6 +207,7 @@ export class Recognizer {
                             break;
                         case "speech.enddetected":
                             requestSession.OnServiceSpeechEndDetectedResponse(JSON.parse(connectionMessage.TextBody));
+                            
                             break;
                         case "speech.phrase":
                             if (this.recognizerConfig.IsContinuousRecognition) {
@@ -259,6 +261,9 @@ export class Recognizer {
     }
 
     private SendTelemetryData = (requestId: string, connection: IConnection, telemetryData: string) => {
+        defer(() => {
+            connection.Dispose();
+        });
         return connection
             .Send(new SpeechConnectionMessage(
                 MessageType.Text,

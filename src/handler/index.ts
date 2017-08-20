@@ -3,6 +3,9 @@ import {
     SpeechResultFormat
 } from "../vendor/microsoft/stt/sdk/speech/Exports"
 import {
+    LogDebug
+} from "../vendor/microsoft/stt/common/Exports"
+import {
     RecognizerSetup,
     RecognizerStart,
     RecognizerStop,
@@ -11,7 +14,7 @@ import {
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-
+import { delay } from "underscore";
 
 let processLock = false;
 
@@ -39,14 +42,18 @@ export function recognize(ctx, next) {
             return ReadFile(filepath).then((buffer: Buffer) => {
                 let recognizer = RecognizerSetup(RecognitionMode.Dictation, 'en-US', SpeechResultFormat['Detail'], 'eb244a3116ad4384ab49bbf379c874af', buffer);
                 return RecognizerStart(recognizer).then((result: Array<any>) => {
-                    processLock = false;
                     ctx.body = { 
                         code: 0,
                         msg: "解析成功",
                         result 
                     };
                     RecognizerStop(recognizer);
+                    delay(() => {
+                        LogDebug("资源释放");
+                        processLock = false;
+                    }, 40*1000);
                 }, (error: any) => {
+                    processLock = false;
                     if(ctx){
                         try {
                             ctx.body = { 
