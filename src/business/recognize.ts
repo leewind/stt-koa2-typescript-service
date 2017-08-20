@@ -36,7 +36,7 @@ const RecognizerSetup = (recognitionMode: RecognitionMode, language: string, for
   return CreateRecognizerWithPcmRecorderByInputBuffer(recognizerConfig, authentication, buffer);
 }
 
-const RecognizerStart = (recognizer: Recognizer): Promise<string> => {
+const RecognizerStart = (recognizer: Recognizer): Promise<Array<any>> => {
   return new Promise((resolve, reject) => {
     let messages = new Array<any>();
     recognizer.Recognize((event: any) => {
@@ -80,15 +80,7 @@ const RecognizerStart = (recognizer: Recognizer): Promise<string> => {
         case "RecognitionEndedEvent":
           LogDebug("#RecognitionEndedEvent");
           LogDebug(JSON.stringify(event)); // Debug information
-
-          let result = '';
-          messages.forEach((msg) => {
-            if (msg.DisplayText) {
-              result = result + ' ' + msg.DisplayText
-            }
-          })
-          LogDebug(result.trim());
-          resolve(result.trim());
+          resolve(messages);
           break;
       }
     })
