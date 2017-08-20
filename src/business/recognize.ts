@@ -15,6 +15,7 @@ import {
 
 import {
   LogDebug,
+  LogError,
 } from "../vendor/microsoft/stt/common/Exports"
 
 const SimulatedUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
@@ -45,41 +46,39 @@ const RecognizerStart = (recognizer: Recognizer): Promise<string> => {
       */
       switch (event.Name) {
         case "RecognitionTriggeredEvent":
-          LogDebug("#####Initializing");
+          LogDebug("#RecognitionTriggeredEvent");
           break;
         case "ListeningStartedEvent":
-          LogDebug("#####Listening");
+          LogDebug("#Listening");
           break;
         case "RecognitionStartedEvent":
-          LogDebug("#####Listening_Recognizing");
+          LogDebug("#Listening_Recognizing");
           break;
         case "SpeechStartDetectedEvent":
-          LogDebug("#####Listening_DetectedSpeech_Recognizing");
+          LogDebug("#SpeechStartDetectedEvent");
           LogDebug(JSON.stringify(event.Result)); // check console for other information in result
           break;
         case "SpeechHypothesisEvent":
-          LogDebug("#####SpeechHypothesisEvent")
+          LogDebug("#SpeechHypothesisEvent")
           LogDebug(event.Result.Text);
           LogDebug(JSON.stringify(event.Result)); // check console for other information in result
           break;
         case "SpeechEndDetectedEvent":
-          // OnSpeechEndDetected();
-          LogDebug("#####Processing_Adding_Final_Touches");
+          LogDebug("#SpeechEndDetectedEvent");
           LogDebug(JSON.stringify(event.Result)); // check console for other information in result
           break;
         case "SpeechSimplePhraseEvent":
           messages.push(event.Result);
-          LogDebug("#####SpeechSimplePhraseEvent")
+          LogDebug("#SpeechSimplePhraseEvent")
           LogDebug(JSON.stringify(event.Result, null, 3));
 
           break;
         case "SpeechDetailedPhraseEvent":
-          LogDebug("#####SpeechDetailedPhraseEvent")
+          LogDebug("#SpeechDetailedPhraseEvent")
           LogDebug(JSON.stringify(event.Result, null, 3));
           break;
         case "RecognitionEndedEvent":
-          // OnComplete();
-          LogDebug("#####Idle");
+          LogDebug("#RecognitionEndedEvent");
           LogDebug(JSON.stringify(event)); // Debug information
 
           let result = '';
@@ -89,7 +88,7 @@ const RecognizerStart = (recognizer: Recognizer): Promise<string> => {
             }
           })
           LogDebug(result.trim());
-          resolve(result.trim())
+          resolve(result.trim());
           break;
       }
     })
@@ -97,7 +96,7 @@ const RecognizerStart = (recognizer: Recognizer): Promise<string> => {
         // The request succeeded. Nothing to do here.
       },
       (error) => {
-        console.error(error);
+        LogError(error);
       });
   });
 }
