@@ -20,8 +20,8 @@ export function recognize(ctx, next) {
     if(processLock){
         return next().then(() => {
             ctx.body = {
-                "code": -100,
-                "msg": "正在运行中无法进行解析"
+                code: -100,
+                msg: "正在运行中无法进行解析"
             };
         });
     }else{
@@ -40,10 +40,27 @@ export function recognize(ctx, next) {
                 let recognizer = RecognizerSetup(RecognitionMode.Dictation, 'en-US', SpeechResultFormat['Detail'], 'eb244a3116ad4384ab49bbf379c874af', buffer);
                 return RecognizerStart(recognizer).then((result: Array<any>) => {
                     processLock = false;
-                    ctx.body = { result };
+                    ctx.body = { 
+                        code: 0,
+                        msg: "解析成功",
+                        result 
+                    };
                     RecognizerStop(recognizer);
+                }, (error: any) => {
+                    if(ctx){
+                        try {
+                            ctx.body = { 
+                                code: -110,
+                                msg: "解析失败",
+                                result: "没有结果获得" 
+                            };
+                        } catch (error) {
+                            
+                        }
+                    }
                 });
             })
+
         })
     }
 }

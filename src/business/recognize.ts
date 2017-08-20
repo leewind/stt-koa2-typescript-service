@@ -16,6 +16,8 @@ import {
 import {
   LogDebug,
   LogError,
+  Events,
+  PlatformEvent,
 } from "../vendor/microsoft/stt/common/Exports"
 
 const SimulatedUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
@@ -39,12 +41,14 @@ const RecognizerSetup = (recognitionMode: RecognitionMode, language: string, for
 const RecognizerStart = (recognizer: Recognizer): Promise<Array<any>> => {
   return new Promise((resolve, reject) => {
     let messages = new Array<any>();
-    recognizer.Recognize((event: any) => {
-      /*
-      Alternative syntax for typescript devs.
-      if (event instanceof SDK.RecognitionTriggeredEvent)
-      */
+
+    let EventTrigger = Events.Instance.Attach((event: any) => {
       switch (event.Name) {
+        case "ConnectionClosedEvent":
+          LogDebug("ConnectionClosedEvent");
+          EventTrigger.Detach();
+          reject('Connection Closed');
+          break;
         case "RecognitionTriggeredEvent":
           LogDebug("#RecognitionTriggeredEvent");
           break;
@@ -80,9 +84,17 @@ const RecognizerStart = (recognizer: Recognizer): Promise<Array<any>> => {
         case "RecognitionEndedEvent":
           LogDebug("#RecognitionEndedEvent");
           LogDebug(JSON.stringify(event)); // Debug information
+
+          EventTrigger.Detach();
           resolve(messages);
           break;
       }
+    })
+    recognizer.Recognize((event: any) => {
+      /*
+      Alternative syntax for typescript devs.
+      if (event instanceof SDK.RecognitionTriggeredEvent)
+      */
     })
       .On(() => {
         // The request succeeded. Nothing to do here.
@@ -110,9 +122,9 @@ const ReadFile = (filepath: string): Promise<Buffer> => {
 
 };
 
-export { 
-  RecognizerSetup, 
-  RecognizerStart, 
-  RecognizerStop, 
-  ReadFile 
+export {
+  RecognizerSetup,
+  RecognizerStart,
+  RecognizerStop,
+  ReadFile
 }
