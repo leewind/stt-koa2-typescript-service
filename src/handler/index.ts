@@ -51,7 +51,7 @@ export function recognize(ctx, next) {
                     delay(() => {
                         LogDebug("资源释放");
                         processLock = false;
-                    }, 40*1000);
+                    }, 30*1000);
                 }, (error: any) => {
                     processLock = false;
                     if(ctx){
