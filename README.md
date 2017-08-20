@@ -52,7 +52,7 @@
 2. 选择一个wav文件，点击upload进行上传
 3. 如果顺利20-30秒之后会返回结果，例如
     ```
-    {"result":"My dream job is to become a CEO in a company. Bring some money to me. Scales and I think I will come see you finally."}
+    {"code":0,"msg":"解析成功","result":[{"RecognitionStatus":"Success","DisplayText":"My dream job is to be come see you in a company.","Offset":2900000,"Duration":37600000},{"RecognitionStatus":"Success","DisplayText":"Bring some money to me.","Offset":55700000,"Duration":25400000},{"RecognitionStatus":"Success","DisplayText":"Scales and I think I will be come see yo finally.","Offset":92800000,"Duration":34900000},{"RecognitionStatus":"EndOfDictation","Offset":142700000,"Duration":0}]}
     ```
 
 ## API
@@ -63,4 +63,4 @@
 + REQUEST: 文件上传格式multipart/form-data
     - 参数 file: File
 + RESPONSE: json对象
-    - 案例: {"result":"My dream job is to become a CEO in a company. Bring some money to me. Scales and I think I will come see you finally."}
+    - 案例: {"code":0,"msg":"解析成功","result":[{"RecognitionStatus":"Success","DisplayText":"My dream job is to be come see you in a company.","Offset":2900000,"Duration":37600000},{"RecognitionStatus":"Success","DisplayText":"Bring some money to me.","Offset":55700000,"Duration":25400000},{"RecognitionStatus":"Success","DisplayText":"Scales and I think I will be come see yo finally.","Offset":92800000,"Duration":34900000},{"RecognitionStatus":"EndOfDictation","Offset":142700000,"Duration":0}]}
