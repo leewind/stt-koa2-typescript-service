@@ -38,16 +38,25 @@ const RecognizerSetup = (recognitionMode: RecognitionMode, language: string, for
   return CreateRecognizerWithPcmRecorderByInputBuffer(recognizerConfig, authentication, buffer);
 }
 
-const RecognizerStart = (recognizer: Recognizer): Promise<Array<any>> => {
+const RecognizerStart = (recognizer: Recognizer, callback: any): Promise<Array<any>> => {
   return new Promise((resolve, reject) => {
     let messages = new Array<any>();
 
     let EventTrigger = Events.Instance.Attach((event: any) => {
       switch (event.Name) {
+        case "ConnectionEstablishErrorEvent":
+          LogDebug("ConnectionEstablishErrorEvent");
+          callback()
+          EventTrigger.Detach();
+          // reject('Connection Closed');
+          
+          break;
         case "ConnectionClosedEvent":
           LogDebug("ConnectionClosedEvent");
+          callback()
           EventTrigger.Detach();
-          reject('Connection Closed');
+          // reject('Connection Closed');
+          
           break;
         case "RecognitionTriggeredEvent":
           LogDebug("#RecognitionTriggeredEvent");
@@ -85,7 +94,7 @@ const RecognizerStart = (recognizer: Recognizer): Promise<Array<any>> => {
           LogDebug("#RecognitionEndedEvent");
           LogDebug(JSON.stringify(event)); // Debug information
 
-          EventTrigger.Detach();
+          // EventTrigger.Detach();
           resolve(messages);
           break;
       }

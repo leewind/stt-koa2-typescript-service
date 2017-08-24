@@ -124,9 +124,11 @@ export class Recognizer {
 
                         completionPromise.On((r: boolean) => {
                             requestSession.Dispose();
+                            connection.Dispose();
                             this.SendTelemetryData(requestSession.RequestId, connection, requestSession.GetTelemetry());
                         }, (error: string) => {
                             requestSession.Dispose(error);
+                            connection.Dispose();
                             this.SendTelemetryData(requestSession.RequestId, connection, requestSession.GetTelemetry());
                         });
 
