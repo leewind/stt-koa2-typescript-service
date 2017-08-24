@@ -1,6 +1,6 @@
 import { RiffPcmEncoder, Stream, ConvertArrayBuffer, LogDebug } from "../common/Exports";
 import { IRecorder } from "./IRecorder";
-import * as WavDecoder from "wav-decoder";
+import * as Wav from "node-wav";
 
 export class PcmRecorder implements IRecorder {
     private mediaResources: IMediaResources;
@@ -15,42 +15,41 @@ export class PcmRecorder implements IRecorder {
         // ReadFile("test.wav").then((buffer: Buffer) => {
         //     return WavDecoder.decode(buffer);
         // }).
-        
-        WavDecoder.decode(this.buffer).then((audioData) => {
-            const desiredSampleRate = 16000;
-            let bufferSize = 2048;
-            let isFirstFrameWritten: boolean = false;
-            if (desiredSampleRate * 4 <= audioData.sampleRate) {
-                bufferSize = 8192;
-            } else if (desiredSampleRate * 2 <= audioData.sampleRate) {
-                bufferSize = 4096;
-            }
 
-            const waveStreamEncoder = new RiffPcmEncoder(audioData.sampleRate, desiredSampleRate);
+        const audioData = Wav.decode(this.buffer);
+        const desiredSampleRate = 16000;
+        let bufferSize = 2048;
+        let isFirstFrameWritten: boolean = false;
+        if (desiredSampleRate * 4 <= audioData.sampleRate) {
+            bufferSize = 8192;
+        } else if (desiredSampleRate * 2 <= audioData.sampleRate) {
+            bufferSize = 4096;
+        }
 
-            for (var i = 0; i < audioData.channelData.length; i++) {
-                const monoAudioChunk = audioData.channelData[i];
-                let encodedAudioFrameWithRiffHeader: ArrayBuffer;
-                let encodedAudioFrame: ArrayBuffer;
-                if (outputStream) {
-                    if (isFirstFrameWritten) {
-                        if (!encodedAudioFrame) {
-                            encodedAudioFrame = waveStreamEncoder.Encode(false, monoAudioChunk);
-                        }
+        const waveStreamEncoder = new RiffPcmEncoder(audioData.sampleRate, desiredSampleRate);
 
-                        outputStream.Write(encodedAudioFrame);
-                    } else {
-                        if (!encodedAudioFrameWithRiffHeader) {
-                            encodedAudioFrameWithRiffHeader =
-                                waveStreamEncoder.Encode(true, monoAudioChunk);
-                        }
-
-                        outputStream.Write(encodedAudioFrameWithRiffHeader);
-                        isFirstFrameWritten = true;
+        for (var i = 0; i < audioData.channelData.length; i++) {
+            const monoAudioChunk = audioData.channelData[i];
+            let encodedAudioFrameWithRiffHeader: ArrayBuffer;
+            let encodedAudioFrame: ArrayBuffer;
+            if (outputStream) {
+                if (isFirstFrameWritten) {
+                    if (!encodedAudioFrame) {
+                        encodedAudioFrame = waveStreamEncoder.Encode(false, monoAudioChunk);
                     }
+
+                    outputStream.Write(encodedAudioFrame);
+                } else {
+                    if (!encodedAudioFrameWithRiffHeader) {
+                        encodedAudioFrameWithRiffHeader =
+                            waveStreamEncoder.Encode(true, monoAudioChunk);
+                    }
+
+                    outputStream.Write(encodedAudioFrameWithRiffHeader);
+                    isFirstFrameWritten = true;
                 }
             }
-        });
+        }
     }
 
     public ReleaseMediaResources = (): void => {
